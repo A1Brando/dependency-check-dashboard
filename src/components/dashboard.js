@@ -3,6 +3,7 @@ import { Line } from 'react-chartjs-2';
 import { Bar } from 'react-chartjs-2';
 import { Pie } from 'react-chartjs-2';
 import { Chart as ChartJS } from 'chart.js/auto';
+import config from '../config';
 
 const options = {
     responsive: true,
@@ -93,8 +94,10 @@ const Dashboard = () => {
     });
 
     useEffect(() => {
+        const backendUrl = config.backendUrl;
+
         // Fetch data from the API
-        fetch('http://localhost:3001/api/get-dashboard-data')
+        fetch(`${backendUrl}/api/get-dashboard-data`)
             .then(response => response.json())
             .then(data => {
                 console.log("Fetched data:", data);  

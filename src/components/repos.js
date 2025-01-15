@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import './repos.css';
-
+import config from '../config'; // Import the config file
 
 
 const Repos = () => {
     const [files, setFiles] = useState([]);  
 
     useEffect(() => {
-        fetch('http://localhost:3001/api/get-file-names')
+        const backendUrl = config.backendUrl;
+
+        fetch(`${backendUrl}/api/get-file-names`)
             .then(response => response.json())
             .then(data => {
                 const newFiles = data.files;
@@ -32,7 +34,7 @@ const Repos = () => {
             <ul>
                 {files.map((file, index) => (
                     <li key={index}>
-                        <a href={`http://localhost:3001/reports/dependency-check-report-${file}.html`} target="_blank" rel="noopener noreferrer">
+                        <a href={`${config.backendUrl}/reports/dependency-check-report-${file}.html`} target="_blank" rel="noopener noreferrer">
                             {file} 
                         </a>
                     </li>

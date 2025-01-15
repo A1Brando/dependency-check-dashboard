@@ -7,6 +7,7 @@ const { Sequelize, DataTypes } = require('sequelize');
 const app = express();
 const port = 3001;
 
+
 const fileDirectoryPath = 'C:/data';
 
 app.use(cors()); 
@@ -132,7 +133,6 @@ const readFilesInDirectory = (directoryPath) => {
         CRITICAL: severityCountsForPie.CRITICAL
     }];
 
-    console.log("Trend Data read files:", trendData);  
 
     Trend.findOne({ where: { date: currentDay } })
         .then(existingTrend => {
@@ -199,7 +199,6 @@ app.get('/api/get-dashboard-data', (req, res) => {
                     date: trend.date,
                     vulnerabilities: trend.vulnerabilities
                 }));
-                console.log("Trend Data from DB:", trendData);
 
                 VulnerabilityTrend.findAll() 
                     .then(vulnerabilityTrends => {
@@ -213,8 +212,6 @@ app.get('/api/get-dashboard-data', (req, res) => {
 
                         const { totalDependencies, totalVulnerabilities, fileVulnerabilitiesCount, vulnerabilitiesPerFile, severityCountsForPie } = readFilesInDirectory(directoryPath);
 
-                        console.log("Server Response - severityCountsForPie:", severityCountsForPie);
-                        console.log("Server Response - dailyVulnerabilityTrendData:", dailyVulnerabilityTrendData);
 
                         const severityCount = totalVulnerabilities.reduce((acc, vuln) => {
                             if (vuln.severity) {
