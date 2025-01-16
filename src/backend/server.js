@@ -59,6 +59,75 @@ sequelize.sync({ force: false })
     .then(() => console.log('Trend table is in sync with the database.'))
     .catch(error => console.error('Error syncing database:', error));
 
+    const processVulnerabilities = (directoryPath) => {
+        let dependencies = {};  // Store all dependencies by severity
+    
+        const files = fs.readdirSync(directoryPath);
+    
+        files.forEach(file => {
+            if (file.endsWith('.json')) {
+                const filePath = path.join(directoryPath, file);
+                const parsedData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    
+                parsedData.dependencies.forEach(dep => {
+                    if (dep.vulnerabilities && dep.fileName) { 
+                        dep.vulnerabilities.forEach(vuln => {
+                            const cveCode = vuln.name || 'N/A'; 
+    
+                            // Create depInfo for each file
+                            const depInfo = {
+                                name: dep.fileName,
+                                cveCode: Array.isArray(cveCode) ? cveCode : [cveCode],  
+                                files: [file.replace('.json', '')],  
+                                severity: vuln.severity || 'N/A'  
+                            };
+    
+                            if (!dependencies[dep.fileName]) {
+                                dependencies[dep.fileName] = { critical: [], high: [], medium: [], low: [], files: new Set() };
+                            }
+    
+                            dependencies[dep.fileName].files.add(file.replace('.json', ''));
+    
+                            if (vuln.severity === 'CRITICAL') {
+                                dependencies[dep.fileName].critical.push(depInfo);
+                            } else if (vuln.severity === 'HIGH') {
+                                dependencies[dep.fileName].high.push(depInfo);
+                            } else if (vuln.severity === 'MEDIUM') {
+                                dependencies[dep.fileName].medium.push(depInfo);
+                            } else if (vuln.severity === 'LOW') {
+                                dependencies[dep.fileName].low.push(depInfo);
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    
+        let sortedDependencies = {};
+        for (let depName in dependencies) {
+            sortedDependencies[depName] = {};
+    
+            sortedDependencies[depName].filesCount = dependencies[depName].files.size;
+    
+            sortedDependencies[depName].criticalCount = dependencies[depName].critical.length;
+            sortedDependencies[depName].highCount = dependencies[depName].high.length;
+            sortedDependencies[depName].mediumCount = dependencies[depName].medium.length;
+            sortedDependencies[depName].lowCount = dependencies[depName].low.length;
+    
+            // Group by severity
+            ['critical', 'high', 'medium', 'low'].forEach(severity => {
+                if (dependencies[depName][severity].length > 0) {
+                    sortedDependencies[depName][severity] = dependencies[depName][severity];
+                }
+            });
+        }
+    
+        return sortedDependencies;
+    };
+    
+    
+    
+
 // Function to read all JSON files in a directory and process them
 const readFilesInDirectory = (directoryPath) => {
     let totalDependencies = 0;
@@ -88,7 +157,7 @@ const readFilesInDirectory = (directoryPath) => {
                         if (vuln.severity === 'LOW') severityCountsForPie.LOW++;
                         if (vuln.severity === 'MEDIUM') severityCountsForPie.MEDIUM++;
                         if (vuln.severity === 'HIGH') severityCountsForPie.HIGH++;
-                        if (vuln.severity === 'CRITICAL') severityCountsForPie.CRITICAL++;
+                        if (vuln.severity === 'CRITICAL') severityCountsForPie.CRITICAL++;               
                     });
                 }
             });
@@ -185,7 +254,7 @@ const readFilesInDirectory = (directoryPath) => {
         dailyVulnerabilityTrendData,
         fileVulnerabilitiesCount,
         vulnerabilitiesPerFile,
-        severityCountsForPie 
+        severityCountsForPie,
     };
 };
 
@@ -257,6 +326,17 @@ setInterval(() => {
     readFilesInDirectory(fileDirectoryPath);
 }, 1800000);  
 
+app.get('/api/get-vulnerable-dependencies', (req, res) => {
+    const directoryPath = fileDirectoryPath;
+
+    try {
+        const sortedDependencies = processVulnerabilities(directoryPath);
+        res.json(sortedDependencies);
+    } catch (error) {
+        console.error('Error processing vulnerabilities:', error);
+        res.status(500).json({ error: 'Error processing vulnerabilities' });
+    }
+});
 
 // Endpoint to show file names
 app.get('/api/get-file-names', (req, response) => {

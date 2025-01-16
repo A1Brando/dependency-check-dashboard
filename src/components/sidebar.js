@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FaHome, FaGithub, FaProjectDiagram, FaTools } from 'react-icons/fa'; 
+import { FaHome, FaGithub, FaProjectDiagram, FaTools, FaPlug } from 'react-icons/fa'; 
 import './sidebar.css';
 
 const Sidebar = () => {
@@ -18,10 +18,16 @@ const Sidebar = () => {
                     </Link>
                 </li>
                 <li>
+                    <Link to="/vulnerableDependencies">
+                        <FaPlug /> Dependencies
+                    </Link>
+                </li>
+                <li>
                     <Link to="/settings">
                         <FaTools /> Settings
                     </Link>
                 </li>
+                
             </ul>
         </div>
     );

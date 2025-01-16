@@ -5,6 +5,7 @@ import Dashboard from './components/dashboard';
 import Repos from './components/repos'; 
 import ProjectDetails from './components/projectDetails'; 
 import Settings from './components/settings';
+import VulnerableDependencies from './components/vulnerableDependencies';
 import './App.css'; 
 
 
@@ -43,6 +44,7 @@ const App = () => {
           <Route path="/dashboard" element={<Dashboard isDarkMode={isDarkMode} toggleTheme={toggleTheme}/>} /> 
           <Route path="/repos" element={<Repos isDarkMode={isDarkMode} toggleTheme={toggleTheme}/>} /> 
           <Route path="/project/:id" element={<ProjectDetails />} /> 
+          <Route path="/vulnerableDependencies" element={<VulnerableDependencies isDarkMode={isDarkMode} toggleTheme={toggleTheme}/>} />
           <Route path="/settings" element={<Settings isDarkMode={isDarkMode} toggleTheme={toggleTheme} />} />
         </Routes>
       </div>
