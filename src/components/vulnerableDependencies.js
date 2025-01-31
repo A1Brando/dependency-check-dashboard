@@ -25,28 +25,39 @@ const VulnerableDependencies = () => {
     if (vulnerabilities.length === 0) {
       return <div>No vulnerabilities found.</div>;
     }
-    
+  
+    // Create a set to store unique files and CVEs
     const uniqueFiles = new Set();
+    const uniqueCVE = new Set();
+  
+    // Loop through the vulnerabilities and collect unique files and CVEs
     vulnerabilities.forEach(vuln => {
-    const files = Array.isArray(vuln.files) ? vuln.files : Array.from(vuln.files);
-    files.forEach(file => uniqueFiles.add(file.replace('dependency-check-report-', ''))); // Remove 'dependency-check-report-' from the filename
-  });
-
+      // Check and collect unique file names (if 'files' exists and is an array)
+      if (vuln.files && Array.isArray(vuln.files)) {
+        vuln.files.forEach(file => uniqueFiles.add(file.replace('dependency-check-report-', ''))); // Remove prefix from filename
+      }
+  
+      // Check and collect unique CVEs (if 'cves' exists and is an array)
+      if (vuln.cveCode && Array.isArray(vuln.cveCode)) {
+        vuln.cveCode.forEach(cve => uniqueCVE.add(cve)); // Add each CVE to the set
+      }
+    });
+  
     return (
       <div>
         <h4>{type} Vulnerabilities</h4>
         <ul>
-          {vulnerabilities.map((vuln, index) => (
-            <li key={index}>
-              <div>CVE(s): {vuln.cveCode.join(", ")}</div>
-            </li>
-          ))}
+          <li>
+            <div>
+              <strong>CVE(s):</strong> {[...uniqueCVE].join(", ")} {/* Join unique CVEs */}
+            </div>
+          </li>
         </ul>
         <div>
           <strong>Located in:</strong>
           <ul>
             {[...uniqueFiles].map((file, idx) => (
-              <li key={idx}>{file}</li>
+              <li key={idx}>{file}</li> 
             ))}
           </ul>
         </div>
@@ -61,30 +72,26 @@ const VulnerableDependencies = () => {
         {Object.keys(data).length > 0 ? (
           Object.keys(data)
             .sort((a, b) => {
-              const severityA = data[a].critical && data[a].critical.length > 0
-                ? 'CRITICAL'
-                : data[a].high && data[a].high.length > 0
-                ? 'HIGH'
-                : data[a].medium && data[a].medium.length > 0
-                ? 'MEDIUM'
-                : 'LOW';
+              // Sort by total number of critical vulnerabilities first
+              const criticalA = data[a]?.critical?.length || 0;
+              const criticalB = data[b]?.critical?.length || 0;
+              if (criticalA !== criticalB) return criticalB - criticalA; // Descending order
 
-              const severityB = data[b].critical && data[b].critical.length > 0
-                ? 'CRITICAL'
-                : data[b].high && data[b].high.length > 0
-                ? 'HIGH'
-                : data[b].medium && data[b].medium.length > 0
-                ? 'MEDIUM'
-                : 'LOW';
+              // If criticals are the same, sort by number of high vulnerabilities
+              const highA = data[a]?.high?.length || 0;
+              const highB = data[b]?.high?.length || 0;
+              if (highA !== highB) return highB - highA; // Descending order
 
-              const severities = ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'];
-              return severities.indexOf(severityA) - severities.indexOf(severityB);
+              // If highs are the same, sort by number of medium vulnerabilities
+              const mediumA = data[a]?.medium?.length || 0;
+              const mediumB = data[b]?.medium?.length || 0;
+              return mediumB - mediumA; // Descending order
             })
             .map(depName => {
-              const criticalCount = data[depName]?.criticalCount || 0;
-              const highCount = data[depName]?.highCount || 0;
-              const mediumCount = data[depName]?.mediumCount || 0;
-              const lowCount = data[depName]?.lowCount || 0;
+              const criticalCount = data[depName]?.critical?.length || 0;
+              const highCount = data[depName]?.high?.length || 0;
+              const mediumCount = data[depName]?.medium?.length || 0;
+              const lowCount = data[depName]?.low?.length || 0;
               const filesCount = data[depName]?.filesCount || 0;
 
               return (
@@ -117,4 +124,3 @@ const VulnerableDependencies = () => {
 };
 
 export default VulnerableDependencies;
-

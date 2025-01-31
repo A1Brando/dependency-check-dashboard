@@ -137,6 +137,8 @@ const readFilesInDirectory = (directoryPath) => {
     let currentDayVulnerabilities = 0;
     let severityCountsForPie = { LOW: 0, MEDIUM: 0, HIGH: 0, CRITICAL: 0 };
 
+    const uniqueDependencies = new Set();
+
     // Get all files in the directory
     const files = fs.readdirSync(directoryPath);
 
@@ -152,6 +154,8 @@ const readFilesInDirectory = (directoryPath) => {
                 if (dep.vulnerabilities) {
                     totalVulnerabilities.push(...dep.vulnerabilities);
                     currentDayVulnerabilities += dep.vulnerabilities.length;
+
+                    uniqueDependencies.add(dep.fileName)
 
                     dep.vulnerabilities.forEach(vuln => {
                         if (vuln.severity === 'LOW') severityCountsForPie.LOW++;
@@ -248,6 +252,7 @@ const readFilesInDirectory = (directoryPath) => {
     });
 
     return {
+        uniqueDependenciesCount: uniqueDependencies.size,
         totalDependencies,
         totalVulnerabilities,
         trend: trendData,

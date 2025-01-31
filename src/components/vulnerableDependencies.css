@@ -6,6 +6,19 @@
     padding: 15px;
     transition: transform 0.3s ease;
   }
+
+  body.dark-mode {
+    background-color: #121212;
+    color: #ffffff;
+  }
+  
+  .dependency-card.dark-mode {
+    background-color: #333;
+    color: #ffffff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  }
+  
+
   
   .dependency-card:hover {
     transform: translateY(-5px);

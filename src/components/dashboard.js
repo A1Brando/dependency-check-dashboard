@@ -260,7 +260,7 @@ const Dashboard = () => {
                 <div>
                     <h3>Vulnerabilities by Severity</h3>
                     <ul>
-                        {['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'].map(severity => {
+                        {['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'].map(severity => {
                             const count = data.vulnerabilities.filter(v => v.severity === severity).length;
                             return (
                                 <li key={severity}>
