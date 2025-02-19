@@ -28,6 +28,7 @@ const VulnerableDependencies = () => {
   
     // Create a set to store unique files and CVEs
     const uniqueFiles = new Set();
+    
     const uniqueCVE = new Set();
   
     // Loop through the vulnerabilities and collect unique files and CVEs
