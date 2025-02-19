@@ -1,6 +1,6 @@
 # Dependency Check Vulnerability Dashboard
 
-A web application built to visualize and manage vulnerabilities in software dependencies. This project fetches vulnerability data from a set of JSON files outputted by OWASP dependency check, processes it, and displays it in various charts and cards, including trends, severity breakdowns, and per-file vulnerabilities. The application is designed to provide an interactive UI to explore vulnerable dependencies. Themed for the colour of the company.
+A web application built to visualize and manage vulnerabilities in software dependencies. This project fetches vulnerability data from a set of JSON files outputted by OWASP dependency check, processes it, and displays it in various charts and cards, including trends, severity breakdowns, and per-file vulnerabilities. The application is designed to provide an interactive UI to explore vulnerable dependencies.
 
 https://github.com/dependency-check/DependencyCheck
 
