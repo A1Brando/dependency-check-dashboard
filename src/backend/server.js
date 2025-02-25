@@ -72,7 +72,13 @@ sequelize.sync({ force: false })
                 parsedData.dependencies.forEach(dep => {
                     if (dep.vulnerabilities && dep.fileName) { 
                         dep.vulnerabilities.forEach(vuln => {
-                            const cveCode = vuln.name || 'N/A'; 
+                            const cveCode = vuln.name || vuln.source || 'N/A'; 
+                            
+                            if (vuln.severity === 'moderate') {
+                                vuln.severity = 'MEDIUM';
+                            }
+
+                            vuln.severity = vuln.severity.toUpperCase();
     
                             // Create depInfo for each file
                             const depInfo = {
@@ -158,6 +164,10 @@ const readFilesInDirectory = (directoryPath) => {
                     uniqueDependencies.add(dep.fileName)
 
                     dep.vulnerabilities.forEach(vuln => {
+                        if (vuln.severity === 'moderate') {
+                            vuln.severity = 'MEDIUM';
+                        }
+                        vuln.severity = vuln.severity.toUpperCase();
                         if (vuln.severity === 'LOW') severityCountsForPie.LOW++;
                         if (vuln.severity === 'MEDIUM') severityCountsForPie.MEDIUM++;
                         if (vuln.severity === 'HIGH') severityCountsForPie.HIGH++;
@@ -172,6 +182,12 @@ const readFilesInDirectory = (directoryPath) => {
             parsedData.dependencies.forEach(dep => {
                 if (dep.vulnerabilities) {
                     dep.vulnerabilities.forEach(vuln => {
+
+                        if (vuln.severity === 'moderate') {
+                            vuln.severity = 'MEDIUM';
+                        }
+                        vuln.severity = vuln.severity.toUpperCase(); 
+
                         if (vuln.severity === 'LOW') low++;
                         if (vuln.severity === 'MEDIUM') medium++;
                         if (vuln.severity === 'HIGH') high++;
